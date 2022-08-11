@@ -42,17 +42,15 @@ export default class TwilioFlexHubspotCRMPlugin extends FlexPlugin {
             console.log("hubspot is ready");
           },
           onDialNumber: (event: any) => {
-            const {
-              phoneNumber,
-              ownerId,
-              portalId,
-              objectId,
-              objectType
-            } = event;
 
-            console.log("call number " + phoneNumber);
+            if (manager.workerClient?.activity.available) {
+              const {
+                phoneNumber
+              } = event;
 
-            flex.Actions.invokeAction("StartOutboundCall", { destination: phoneNumber });
+              console.log("call number " + phoneNumber);
+              flex.Actions.invokeAction("StartOutboundCall", { destination: phoneNumber });
+            }
 
           },
           onEngagementCreated: (event: any) => {
@@ -75,10 +73,9 @@ export default class TwilioFlexHubspotCRMPlugin extends FlexPlugin {
 
       const afterStartOutboundCallListener = (payload: any) => {
         console.log("call start");
-        console.log(payload);
         cti.outgoingCall({
           createEngagement: true,
-          phoneNumber: ""
+          phoneNumber: payload.destination
         });
       };
 
